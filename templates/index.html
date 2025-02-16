@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Events Countdown</title>
+    <link rel="stylesheet" href="static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Upcoming Events Countdown</h1>
+
+        <!-- Event Form -->
+        <form id="event-form">
+            <input type="text" id="event-name" placeholder="Event Name" required>
+            <input type="datetime-local" id="event-date" required>
+            <button type="submit">Add Event</button>
+        </form>
+
+        <!-- Event Timers will be dynamically generated here -->
+        <div id="events-container"></div>
+    </div>
+
+    <script>
+        // Get the container and form elements
+        const eventsContainer = document.getElementById('events-container');
+        const eventForm = document.getElementById('event-form');
+
+        // Listen for form submissions
+        eventForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Get user input
+            const eventName = document.getElementById('event-name').value;
+            const eventDate = document.getElementById('event-date').value;
+
+            // Clear form inputs
+            eventForm.reset();
+
+            // Validate date input
+            if (new Date(eventDate).getTime() <= new Date().getTime()) {
+                alert("Please select a future date and time.");
+                return;
+            }
+
+            // Create event element
+            const eventDiv = document.createElement('div');
+            eventDiv.classList.add('event');
+
+            const eventNameDiv = document.createElement('div');
+            eventNameDiv.classList.add('event-name');
+            eventNameDiv.innerText = eventName;
+
+            const timerDiv = document.createElement('div');
+            timerDiv.classList.add('timer');
+            const timerId = `countdown_${Date.now()}`;
+            timerDiv.id = timerId;
+
+            // Append to container
+            eventDiv.appendChild(eventNameDiv);
+            eventDiv.appendChild(timerDiv);
+            eventsContainer.appendChild(eventDiv);
+
+            // Set up countdown
+            const countdownTimer = setInterval(() => {
+                const now = new Date().getTime();
+                const timeRemaining = new Date(eventDate).getTime() - now;
+
+                // Calculate time components
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                // Update the countdown timer HTML
+                if (timeRemaining > 0) {
+                    timerDiv.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                } else {
+                    clearInterval(countdownTimer);
+                    timerDiv.innerHTML = "<span class='event-started'>Event Started!</span>";
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
